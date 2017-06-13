@@ -354,7 +354,8 @@ func (this *Session) HandlePacket(packet packet.Packet) (err error) {
 				return
 			}
 
-			if !this.server.Authenticate() || strings.Contains(this.name, "Camera") {
+			//if authentication is configured to disabled, or if player has "camera" in their name
+			if !this.server.Authenticate() || strings.Contains(this.name, "camera") {
 				this.profile = auth.GameProfile{
 					Id:         GenNameUUID("OfflinePlayer:" + this.name),
 					Properties: make([]auth.GameProfileProperty, 0),
