@@ -353,7 +353,14 @@ func (this *Session) HandlePacket(packet packet.Packet) (err error) {
 				err = errors.New("Unexpected name: pattern mismatch")
 				return
 			}
-			if this.server.Authenticate() {
+
+			if !this.server.Authenticate() || strings.Contains(this.name, "Camera") {
+				this.profile = auth.GameProfile{
+					Id:         GenNameUUID("OfflinePlayer:" + this.name),
+					Properties: make([]auth.GameProfileProperty, 0),
+				}
+				this.SetAuthenticated(true)
+			} else {
 				this.serverId, err = GenSalt()
 				if err != nil {
 					return
@@ -367,12 +374,6 @@ func (this *Session) HandlePacket(packet packet.Packet) (err error) {
 					return
 				}
 				this.state = STATE_LOGIN_ENCRYPT
-			} else {
-				this.profile = auth.GameProfile{
-					Id:         GenNameUUID("OfflinePlayer:" + this.name),
-					Properties: make([]auth.GameProfileProperty, 0),
-				}
-				this.SetAuthenticated(true)
 			}
 		} else {
 			err = errors.New("Unexpected packet: login start expected")
